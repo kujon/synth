@@ -81,4 +81,21 @@ impl Notes {
             Notes::B => Notes::ASharp,
         }
     }
+
+    pub fn semitone_up(&self) -> Notes {
+        match self {
+            Notes::C => Notes::CSharp,
+            Notes::CSharp => Notes::D,
+            Notes::D => Notes::DSharp,
+            Notes::DSharp => Notes::E,
+            Notes::E => Notes::F,
+            Notes::F => Notes::FSharp,
+            Notes::FSharp => Notes::G,
+            Notes::G => Notes::GSharp,
+            Notes::GSharp => Notes::A,
+            Notes::A => Notes::ASharp,
+            Notes::ASharp => Notes::B,
+            Notes::B => Notes::C,
+        }
+    }
 }
