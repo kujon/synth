@@ -1,5 +1,6 @@
 use ::std::f32::consts::PI;
 
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Frequency {
     Angular(f32),
     Hertz(f32),
@@ -32,7 +33,8 @@ impl Frequency {
     }
 }
 
-pub enum Notes {
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum Note {
     C,
     CSharp,
     D,
@@ -47,55 +49,55 @@ pub enum Notes {
     B,
 }
 
-impl Notes {
+impl Note {
     pub fn to_frequency(&self) -> Frequency {
         match self {
-            Notes::C => Frequency::Hertz(261.63),
-            Notes::CSharp => Frequency::Hertz(277.18),
-            Notes::D => Frequency::Hertz(293.66),
-            Notes::DSharp => Frequency::Hertz(311.13),
-            Notes::E => Frequency::Hertz(329.63),
-            Notes::F => Frequency::Hertz(349.23),
-            Notes::FSharp => Frequency::Hertz(369.99),
-            Notes::G => Frequency::Hertz(392.00),
-            Notes::GSharp => Frequency::Hertz(415.30),
-            Notes::A => Frequency::Hertz(440.00),
-            Notes::ASharp => Frequency::Hertz(466.16),
-            Notes::B => Frequency::Hertz(493.88),
+            Note::C => Frequency::Hertz(261.63),
+            Note::CSharp => Frequency::Hertz(277.18),
+            Note::D => Frequency::Hertz(293.66),
+            Note::DSharp => Frequency::Hertz(311.13),
+            Note::E => Frequency::Hertz(329.63),
+            Note::F => Frequency::Hertz(349.23),
+            Note::FSharp => Frequency::Hertz(369.99),
+            Note::G => Frequency::Hertz(392.00),
+            Note::GSharp => Frequency::Hertz(415.30),
+            Note::A => Frequency::Hertz(440.00),
+            Note::ASharp => Frequency::Hertz(466.16),
+            Note::B => Frequency::Hertz(493.88),
         }
     }
 
-    pub fn semitone_down(&self) -> Notes {
+    pub fn semitone_down(&self) -> Note {
         match self {
-            Notes::C => Notes::B,
-            Notes::CSharp => Notes::C,
-            Notes::D => Notes::CSharp,
-            Notes::DSharp => Notes::D,
-            Notes::E => Notes::DSharp,
-            Notes::F => Notes::E,
-            Notes::FSharp => Notes::F,
-            Notes::G => Notes::FSharp,
-            Notes::GSharp => Notes::G,
-            Notes::A => Notes::GSharp,
-            Notes::ASharp => Notes::A,
-            Notes::B => Notes::ASharp,
+            Note::C => Note::B,
+            Note::CSharp => Note::C,
+            Note::D => Note::CSharp,
+            Note::DSharp => Note::D,
+            Note::E => Note::DSharp,
+            Note::F => Note::E,
+            Note::FSharp => Note::F,
+            Note::G => Note::FSharp,
+            Note::GSharp => Note::G,
+            Note::A => Note::GSharp,
+            Note::ASharp => Note::A,
+            Note::B => Note::ASharp,
         }
     }
 
-    pub fn semitone_up(&self) -> Notes {
+    pub fn semitone_up(&self) -> Note {
         match self {
-            Notes::C => Notes::CSharp,
-            Notes::CSharp => Notes::D,
-            Notes::D => Notes::DSharp,
-            Notes::DSharp => Notes::E,
-            Notes::E => Notes::F,
-            Notes::F => Notes::FSharp,
-            Notes::FSharp => Notes::G,
-            Notes::G => Notes::GSharp,
-            Notes::GSharp => Notes::A,
-            Notes::A => Notes::ASharp,
-            Notes::ASharp => Notes::B,
-            Notes::B => Notes::C,
+            Note::C => Note::CSharp,
+            Note::CSharp => Note::D,
+            Note::D => Note::DSharp,
+            Note::DSharp => Note::E,
+            Note::E => Note::F,
+            Note::F => Note::FSharp,
+            Note::FSharp => Note::G,
+            Note::G => Note::GSharp,
+            Note::GSharp => Note::A,
+            Note::A => Note::ASharp,
+            Note::ASharp => Note::B,
+            Note::B => Note::C,
         }
     }
 }
