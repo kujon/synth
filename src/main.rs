@@ -16,26 +16,26 @@ use crate::utils::frequency::Note;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (_stream, stream_handle) = OutputStream::try_default()?;
 
-    let mut voices: VecDeque<(Note, Sink)> = VecDeque::with_capacity(2);
-
-    let mut current_note: Option<Note> = None;
+    let num_voices = 4;
+    let mut voices: VecDeque<(Note, Sink)> = VecDeque::with_capacity(num_voices);
 
     // This will block.
     if let Err(error) = listen(move |event| match event.event_type {
         EventType::KeyPress(key) => {
             if let Some(note) = key.to_note() {
-                println!("Note pressed {:?}", note);
-
-                if Some(note) != current_note {
+                if !voices.iter().any(|v| v.0 == note) {
                     match Sink::try_new(&stream_handle) {
                         Ok(sink) => {
-                            current_note = Some(note);
+                            println!("Note pressed {:?}", note);
                             sink.append(SquareWave::new(note.to_frequency()));
                             sink.play();
                             if voices.len() == voices.capacity() {
                                 voices.pop_back();
                             }
                             voices.push_front((note, sink));
+
+                            let just_notes: Vec<_> = voices.iter().map(|v| v.0).collect();
+                            println!("{:?}", just_notes);
                         }
                         Err(e) => {
                             println!("{:?}", e);
@@ -46,9 +46,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         EventType::KeyRelease(key) => {
             if let Some(note) = key.to_note() {
-                println!("Note released {:?}", note);
                 if let Some(index) = voices.iter().position(|(n, _)| n == &note) {
+                    println!("Note released {:?}", note);
                     voices.remove(index);
+                    let just_notes: Vec<_> = voices.iter().map(|v| v.0).collect();
+                    println!("{:?}", just_notes);
                 }
             }
         }
