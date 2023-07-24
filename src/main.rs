@@ -6,7 +6,7 @@ use std::collections::VecDeque;
 
 use ::rodio::{OutputStream, Sink};
 // TO DO: replace this crate with proper windowing so that we don't have to grant accessibility permissions to listen to keystrokes globally.
-use rdev::{listen, Event, EventType};
+use rdev::{listen, Event, EventType, Key};
 
 use crate::input::keys::ToNote;
 use crate::oscilators::sine::SineWave;
@@ -17,13 +17,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (_stream, stream_handle) = OutputStream::try_default()?;
 
     let num_voices = 4;
-    let mut voices: VecDeque<(Note, Sink)> = VecDeque::with_capacity(num_voices);
+    let mut voices: VecDeque<(Key, Sink)> = VecDeque::with_capacity(num_voices);
 
     // This will block.
     if let Err(error) = listen(move |event| match event.event_type {
         EventType::KeyPress(key) => {
-            if let Some(note) = key.to_note() {
-                if !voices.iter().any(|v| v.0 == note) {
+            if !voices.iter().any(|v| v.0 == key) {
+                if let Some(note) = key.to_note() {
                     match Sink::try_new(&stream_handle) {
                         Ok(sink) => {
                             println!("Note pressed {:?}", note);
@@ -32,7 +32,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             if voices.len() == voices.capacity() {
                                 voices.pop_back();
                             }
-                            voices.push_front((note, sink));
+                            voices.push_front((key, sink));
 
                             let just_notes: Vec<_> = voices.iter().map(|v| v.0).collect();
                             println!("{:?}", just_notes);
@@ -45,13 +45,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         EventType::KeyRelease(key) => {
-            if let Some(note) = key.to_note() {
-                if let Some(index) = voices.iter().position(|(n, _)| n == &note) {
-                    println!("Note released {:?}", note);
-                    voices.remove(index);
-                    let just_notes: Vec<_> = voices.iter().map(|v| v.0).collect();
-                    println!("{:?}", just_notes);
-                }
+            if let Some(index) = voices.iter().position(|(k, _)| k == &key) {
+                println!("Note released {:?}", key.to_note());
+                voices.remove(index);
+                let just_notes: Vec<_> = voices.iter().map(|v| v.0).collect();
+                println!("{:?}", just_notes);
             }
         }
         _ => (),
