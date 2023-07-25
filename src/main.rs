@@ -3,19 +3,13 @@ mod oscilators;
 mod utils;
 mod voices;
 
-use std::cmp::Ordering;
-use std::collections::{BTreeMap, VecDeque};
-use std::time::SystemTime;
-
 use ::rodio::{OutputStream, Sink};
 // TO DO: replace this crate with proper windowing so that we don't have to grant accessibility permissions to listen to keystrokes globally.
-use rdev::{listen, Event, EventType, Key};
+use rdev::{listen, EventType};
 use voices::voices::Voices;
 
 use crate::input::keys::ToNote;
 use crate::oscilators::sine::SineWave;
-use crate::oscilators::square::SquareWave;
-use crate::utils::frequency::Note;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (_stream, stream_handle) = OutputStream::try_default()?;

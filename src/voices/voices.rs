@@ -1,9 +1,4 @@
-use std::{
-    cmp::Ordering,
-    collections::BTreeMap,
-    fmt::{write, Debug},
-    time::SystemTime,
-};
+use std::{cmp::Ordering, collections::BTreeMap, fmt::Debug, time::SystemTime};
 
 use rdev::Key;
 use rodio::Sink;
