@@ -71,18 +71,23 @@ impl Voices {
         }
     }
 
-    pub fn contains(&self, key: &Key) -> bool {
+    fn is_playing(&self, key: &Key) -> bool {
         self.voices.contains_key(&WithCreationTime::new(*key))
     }
 
-    pub fn insert(&mut self, key: Key, sink: Sink) -> Option<Sink> {
-        if self.voices.len() == self.capacity {
-            self.voices.pop_first();
+    pub fn play(&mut self, key: Key, sink: Sink) -> Option<&Sink> {
+        if !self.is_playing(&key) {
+            if self.voices.len() == self.capacity {
+                self.voices.pop_first();
+            }
+            self.voices.insert(WithCreationTime::new(key), sink);
+            self.voices.get(&WithCreationTime::new(key))
+        } else {
+            None
         }
-        self.voices.insert(WithCreationTime::new(key), sink)
     }
 
-    pub fn remove(&mut self, key: &Key) -> Option<Sink> {
+    pub fn stop(&mut self, key: &Key) -> Option<Sink> {
         self.voices.remove(&WithCreationTime::new(*key))
     }
 }

@@ -25,24 +25,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // This will block.
     if let Err(error) = listen(move |event| match event.event_type {
         EventType::KeyPress(key) => {
-            if !voices.contains(&key) {
-                if let Some(note) = key.to_note() {
-                    match Sink::try_new(&stream_handle) {
-                        Ok(sink) => {
-                            sink.append(SineWave::new(note.to_frequency()));
-                            sink.play();
-                            voices.insert(key, sink);
+            if let Some(note) = key.to_note() {
+                match Sink::try_new(&stream_handle) {
+                    Ok(sink) => {
+                        sink.append(SineWave::new(note.to_frequency()));
+                        sink.play();
+                        let played = voices.play(key, sink);
+                        if played.is_some() {
                             println!("Key pressed: {:?}, voices: {:?}", key, voices);
                         }
-                        Err(e) => {
-                            println!("{:?}", e);
-                        }
+                    }
+                    Err(e) => {
+                        println!("{:?}", e);
                     }
                 }
             }
         }
         EventType::KeyRelease(key) => {
-            let removed = voices.remove(&key);
+            let removed = voices.stop(&key);
             if removed.is_some() {
                 println!("Key released: {:?}, voices: {:?}", key, voices);
             }
