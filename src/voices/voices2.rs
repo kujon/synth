@@ -1,9 +1,9 @@
 use rdev::Key;
 
 fn get_ordinal(key: Key) -> u8 {
-    let ptr_to_option = (&key as *const Key) as *const u8;
+    let ptr_to_enum: *const u8 = (&key as *const Key) as *const u8;
     unsafe {
-        *ptr_to_option
+        *ptr_to_enum
     }
 }
 
