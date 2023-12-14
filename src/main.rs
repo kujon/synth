@@ -14,7 +14,7 @@ use crate::oscilators::sine::SineWave;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (_stream, stream_handle) = OutputStream::try_default()?;
     let num_voices = 4;
-    let mut voices = Voices::new(num_voices);
+    let mut voices: Voices<Sink> = Voices::new(num_voices);
 
     // This will block.
     if let Err(error) = listen(move |event| match event.event_type {
@@ -36,7 +36,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         EventType::KeyRelease(key) => {
-            let removed = voices.stop(&key);
+            let removed = voices.stop(key);
             if removed.is_some() {
                 println!("Key released: {:?}, voices: {:?}", key, voices);
             }

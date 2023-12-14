@@ -1,7 +1,6 @@
 use std::{cmp::Ordering, collections::BTreeMap, fmt::Debug, time::SystemTime};
 
 use rdev::Key;
-use rodio::Sink;
 
 #[derive(Debug, Clone, Copy, Eq)]
 struct WithCreationTime<T> {
@@ -14,6 +13,13 @@ impl<T> WithCreationTime<T> {
         Self {
             item,
             creation_time: SystemTime::now(),
+        }
+    }
+
+    fn new_with_time(item: T, creation_time: SystemTime) -> Self {
+        Self {
+            item,
+            creation_time,
         }
     }
 }
@@ -53,12 +59,12 @@ where
     }
 }
 
-pub struct Voices {
-    voices: BTreeMap<WithCreationTime<Key>, Sink>,
+pub struct Voices<T> {
+    voices: BTreeMap<WithCreationTime<Key>, T>,
     capacity: usize,
 }
 
-impl Voices {
+impl <T> Voices<T> {
     pub fn new(capacity: usize) -> Self {
         Self {
             voices: BTreeMap::new(),
@@ -66,28 +72,42 @@ impl Voices {
         }
     }
 
-    fn is_playing(&self, key: &Key) -> bool {
-        self.voices.contains_key(&WithCreationTime::new(*key))
+    fn is_playing(&self, key: Key) -> bool {
+        self.voices.contains_key(&WithCreationTime::new(key))
     }
 
-    pub fn play(&mut self, key: Key, sink: Sink) -> Option<&Sink> {
-        if !self.is_playing(&key) {
+    pub fn play(&mut self, key: Key, sink: T) -> Option<&T> {
+        if !self.is_playing(key) {
             if self.voices.len() == self.capacity {
                 self.voices.pop_first();
             }
-            self.voices.insert(WithCreationTime::new(key), sink);
-            self.voices.get(&WithCreationTime::new(key))
+            let w = WithCreationTime::new(key);
+            self.voices.insert(w, sink);
+            self.voices.get(&w)
         } else {
             None
         }
     }
 
-    pub fn stop(&mut self, key: &Key) -> Option<Sink> {
-        self.voices.remove(&WithCreationTime::new(*key))
+    pub fn play_with_time(&mut self, key: Key, time: SystemTime, sink: T) -> Option<&T> {
+        if !self.is_playing(key) {
+            if self.voices.len() == self.capacity {
+                self.voices.pop_first();
+            }
+            let w = WithCreationTime::new_with_time(key, time);
+            self.voices.insert(w, sink);
+            self.voices.get(&w)
+        } else {
+            None
+        }
+    }
+
+    pub fn stop(&mut self, key: Key) -> Option<T> {
+        self.voices.remove(&WithCreationTime::new(key))
     }
 }
 
-impl Debug for Voices {
+impl <T> Debug for Voices<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let keys: Vec<_> = self.voices.iter().map(|v| v.0.item).collect();
 
